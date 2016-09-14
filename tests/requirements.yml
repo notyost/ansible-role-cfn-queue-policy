@@ -1,0 +1,4 @@
+- src: https://github.com/mGageTechOps/ansible-role-cfn-sns
+  name: ansible-role-cfn-sns
+- src: https://github.com/mGageTechOps/ansible-role-cfn-sqs
+  name: ansible-role-cfn-sqs

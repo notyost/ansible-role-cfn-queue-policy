@@ -1,0 +1,45 @@
+---
+- name: test creation
+  hosts: test
+  remote_user: root
+  vars:
+    sns_stack_name: "test-ansible-role-cfn-queue-policy-sns"
+    
+  roles:
+    - role: ansible-role-cfn-sqs
+      sqs_stack_name: "test-ansible-role-cfn-queue-policy-sqs"
+      region: "us-west-2"
+    - role: ansible-role-cfn-sns
+    - role: ansible-role-cfn-queue-policy
+      queue_policy_stack_name: "test-ansible-role-cfn-queue-policy"
+      queue_policy_queue_urls: ["{{ sqs_cf_output.stack_outputs.QueueURL }}"]
+      queue_policy:
+        Version: "2012-10-17"
+        Id: "SNStoSQS"
+        Statement: 
+          - Sid: "rule1"
+            Effect: "Allow"
+            Principal: "*"
+            Action: "sqs:*"
+            Resource: "{{ sqs_cf_output.stack_outputs.QueueARN }}"
+            Condition: { ArnEquals: { "aws:SourceArn": "{{ sns_stack_output.stack_outputs.SNSTopicARN }}"} }
+    - role: ansible-role-cfn-sns
+      sns_subs:
+        - endpoint: "{{ sqs_cf_output.stack_outputs.QueueARN }}"
+          proto: sqs
+
+- name: test removal
+  hosts: test
+  remote_user: root
+    
+  roles:
+    - role: ansible-role-cfn-sqs
+      sqs_stack_name: "test-ansible-role-cfn-queue-policy-sqs"
+      region: "us-west-2"
+      sqs_stack_state: "absent"
+    - role: ansible-role-cfn-sns
+      sns_stack_name: "test-ansible-role-cfn-queue-policy-sns"
+      sns_stack_state: "absent"
+    - role: ansible-role-cfn-queue-policy
+      queue_policy_stack_name: "test-ansible-role-cfn-queue-policy"
+      queue_policy_stack_state: "absent"

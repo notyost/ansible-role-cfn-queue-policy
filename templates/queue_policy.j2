@@ -1,0 +1,15 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "{{ queue_policy_description|default('Probably just some queue policy, you know?') }}",
+  "Resources" : {
+    "QueuePolicy": {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Properties": {
+        "PolicyDocument": {{ queue_policy|to_json }},
+        "Queues": [
+            {% for queue in queue_policy_queue_urls %}"{{ queue }}"{% if not loop.last %}, {% endif %}{% endfor %}
+        ]
+      }
+    }
+  }
+}

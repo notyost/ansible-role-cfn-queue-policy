@@ -1,0 +1,23 @@
+---
+# tasks file for ansible-role-cfn-queue-policy
+- name: Create build directory
+  file:
+    dest: build
+    state: directory
+
+- name: Template role
+  template:
+    src: queue_policy.j2
+    dest: "build/queue_policy.json"
+
+- name: Create or remove role stack
+  cloudformation:
+    template: "build/queue_policy.json"
+    stack_name: "{{ queue_policy_stack_name }}"
+    state: "{{ queue_policy_stack_state|default('present') }}"
+    region: "{{ region|default('us-west-2') }}"
+    security_token: "{{ lookup('env','AWS_SESSION_TOKEN')|default(omit, true) }}"
+    tags: "{{ queue_policy_tags }}"
+  register: queue_policy_cf_output
+
+- debug: msg="{{ queue_policy_cf_output }}" verbosity=1

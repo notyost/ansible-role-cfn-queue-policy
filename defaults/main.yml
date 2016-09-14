@@ -1,0 +1,5 @@
+---
+# defaults file for ansible-role-cfn-queue-policy
+queue_policy_queue_urls: []
+queue_policy_tags: {}
+queue_policy: ""
