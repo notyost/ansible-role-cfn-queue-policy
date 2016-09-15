@@ -5,12 +5,12 @@
     dest: build
     state: directory
 
-- name: Template role
+- name: Template queue policy
   template:
     src: queue_policy.j2
     dest: "build/queue_policy.json"
 
-- name: Create or remove role stack
+- name: Create or remove queue policy stack
   cloudformation:
     template: "build/queue_policy.json"
     stack_name: "{{ queue_policy_stack_name }}"
